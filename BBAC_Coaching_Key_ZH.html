@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBAC · 四大元素钥匙</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --earth: #7A5C3A; --earth-light: #F5EDE0; --earth-mid: #C4A882;
+    --water: #2A5F7A; --water-light: #E0EEF5; --water-mid: #6EA8C4;
+    --air:   #3A6B4E; --air-light:   #E0F0E8; --air-mid:   #7CB896;
+    --fire:  #A83A18; --fire-light:  #F5E8E0; --fire-mid:  #D4784A;
+    --ink: #1A1510; --parchment: #F8F4EE; --warm-grey: #E8E0D4; --mid-grey: #8A8078;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { font-family: 'EB Garamond', Georgia, serif; background: var(--parchment); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1000; opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  header { background: var(--ink); padding: 48px 48px 40px; position: relative; overflow: hidden; }
+  header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--earth-mid), var(--water-mid), var(--air-mid), var(--fire-mid)); }
+
+  .header-eyebrow { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.3em; color: var(--earth-mid); text-transform: uppercase; margin-bottom: 16px; opacity: 0; animation: fadeUp 0.8s 0.1s forwards; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(28px, 5vw, 44px); color: var(--parchment); letter-spacing: 0.04em; line-height: 1.2; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+  .header-sub { font-family: 'EB Garamond', serif; font-style: italic; font-size: 15px; color: var(--mid-grey); margin-top: 10px; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .element-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-bottom: 48px; background: var(--warm-grey); border: 2px solid var(--warm-grey); opacity: 0; animation: fadeUp 0.8s 0.4s forwards; }
+  @media (max-width: 600px) { .element-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .element-btn { background: var(--parchment); border: none; padding: 28px 16px 24px; cursor: pointer; transition: background 0.3s; text-align: center; position: relative; overflow: hidden; }
+  .element-btn::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--el-color); transform: scaleX(0); transition: transform 0.3s; transform-origin: left; }
+  .element-btn:hover::before, .element-btn.active::before { transform: scaleX(1); }
+  .element-btn.active { background: var(--el-color); }
+  .element-btn.active .el-symbol, .element-btn.active .el-name, .element-btn.active .el-age { color: #fff !important; }
+  .element-btn:hover:not(.active) { background: var(--el-light); }
+
+  .el-symbol { font-size: 32px; color: var(--el-color); display: block; margin-bottom: 10px; transition: color 0.3s; line-height: 1; }
+  .el-name { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.15em; color: var(--el-color); display: block; margin-bottom: 4px; transition: color 0.3s; }
+  .el-age { font-family: 'EB Garamond', serif; font-size: 11px; color: var(--mid-grey); font-style: italic; transition: color 0.3s; }
+
+  .panel { background: #fff; border: 1px solid var(--warm-grey); border-top: 4px solid var(--el-color); display: none; animation: panelIn 0.4s ease forwards; }
+  .panel.visible { display: block; }
+
+  @keyframes panelIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  .panel-header { padding: 28px 36px 24px; border-bottom: 1px solid var(--warm-grey); display: grid; grid-template-columns: 1fr 1fr; gap: 32px; background: var(--el-light); }
+  @media (max-width: 600px) { .panel-header { grid-template-columns: 1fr; } }
+
+  .panel-header-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.25em; color: var(--el-color); text-transform: uppercase; margin-bottom: 8px; }
+  .panel-system { font-size: 14px; color: #555; line-height: 1.6; }
+  .panel-resource { font-style: italic; font-size: 14px; color: #333; line-height: 1.75; border-left: 3px solid var(--el-color); padding-left: 16px; }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--warm-grey); overflow-x: auto; }
+  .tab-btn { flex: 1; min-width: 100px; padding: 14px 10px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.15em; color: var(--mid-grey); text-transform: uppercase; transition: all 0.2s; white-space: nowrap; }
+  .tab-btn:hover { color: var(--el-color); background: var(--el-light); }
+  .tab-btn.active { color: var(--el-color); border-bottom-color: var(--el-color); background: #fff; }
+
+  .tab-content { display: none; padding: 36px; }
+  .tab-content.visible { display: block; animation: panelIn 0.3s ease forwards; }
+
+  .diag-item { display: flex; gap: 16px; margin-bottom: 14px; padding: 16px 18px; background: var(--el-light); border-left: 3px solid var(--el-color); }
+  .diag-num { font-family: 'Cinzel', serif; font-size: 11px; color: var(--el-color); font-weight: 600; min-width: 20px; padding-top: 2px; }
+  .diag-text { font-size: 14px; line-height: 1.75; color: #333; }
+
+  .convergence-box { margin-top: 28px; padding: 20px 24px; background: var(--ink); }
+  .convergence-box .label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.25em; color: var(--el-mid); text-transform: uppercase; margin-bottom: 10px; }
+  .convergence-box p { font-style: italic; font-size: 13px; color: #ccc; line-height: 1.8; }
+
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.2em; color: var(--el-color); text-transform: uppercase; padding: 10px 14px; background: var(--el-light); text-align: left; border-bottom: 2px solid var(--el-color); }
+  .data-table td { padding: 11px 14px; font-size: 13px; line-height: 1.6; border-bottom: 1px solid var(--warm-grey); vertical-align: top; }
+  .data-table tr:nth-child(even) td { background: #fafafa; }
+  .data-table td:first-child { font-weight: 500; color: #333; }
+  .data-table td:last-child { color: #666; font-style: italic; }
+
+  .bridge-box { margin-top: 28px; padding: 20px 24px; border-left: 5px solid var(--el-color); background: var(--el-light); }
+  .bridge-box .label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.25em; color: var(--el-color); text-transform: uppercase; margin-bottom: 10px; }
+  .bridge-box p { font-size: 16px; font-style: italic; color: var(--ink); line-height: 1.75; }
+
+  .q-item { display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start; }
+  .q-num { width: 36px; height: 36px; border-radius: 50%; background: var(--el-color); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 13px; flex-shrink: 0; }
+  .q-text { font-size: 15px; font-style: italic; color: #333; line-height: 1.8; padding-top: 6px; }
+
+  .resource-note { margin-top: 32px; padding: 20px 24px; background: var(--ink); }
+  .resource-note .label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.25em; color: var(--el-mid); text-transform: uppercase; margin-bottom: 10px; }
+  .resource-note p { font-style: italic; font-size: 13px; color: #ccc; line-height: 1.8; }
+
+  /* ── ILLUSTRATIONS TAB ── */
+  .illus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 640px) { .illus-grid { grid-template-columns: 1fr; } }
+
+  .illus-card { background: var(--el-light); border: 1px solid var(--warm-grey); padding: 24px; }
+  .illus-card-title { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; color: var(--el-color); text-transform: uppercase; margin-bottom: 16px; text-align: center; }
+  .illus-card svg { display: block; margin: 0 auto; }
+  .illus-caption { font-size: 12px; font-style: italic; color: var(--mid-grey); text-align: center; margin-top: 12px; line-height: 1.5; }
+
+  .placeholder { text-align: center; padding: 80px 20px; color: var(--mid-grey); font-style: italic; font-size: 16px; border: 2px dashed var(--warm-grey); opacity: 0; animation: fadeUp 0.8s 0.5s forwards; }
+
+  footer { text-align: center; padding: 40px 24px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.2em; color: var(--mid-grey); text-transform: uppercase; border-top: 1px solid var(--warm-grey); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">传记艺术教练认证 · BBAC · earth-s institute</div>
+  <h1>四大元素钥匙</h1>
+  <p class="header-sub">从传记诊断到教练干预 · Prof. Hildrun Rolff</p>
+</header>
+
+<main>
+  <div class="element-grid">
+    <button class="element-btn" style="--el-color:var(--earth);--el-light:var(--earth-light);--el-mid:var(--earth-mid);" onclick="selectElement('earth',this)">
+      <span class="el-symbol">◼</span><span class="el-name">土</span><span class="el-age">出生 – 3½岁 · 固态</span>
+    </button>
+    <button class="element-btn" style="--el-color:var(--water);--el-light:var(--water-light);--el-mid:var(--water-mid);" onclick="selectElement('water',this)">
+      <span class="el-symbol">◎</span><span class="el-name">水</span><span class="el-age">3½ – 7岁 · 液态</span>
+    </button>
+    <button class="element-btn" style="--el-color:var(--air);--el-light:var(--air-light);--el-mid:var(--air-mid);" onclick="selectElement('air',this)">
+      <span class="el-symbol">△</span><span class="el-name">气</span><span class="el-age">7 – 10½岁 · 气态</span>
+    </button>
+    <button class="element-btn" style="--el-color:var(--fire);--el-light:var(--fire-light);--el-mid:var(--fire-mid);" onclick="selectElement('fire',this)">
+      <span class="el-symbol">✦</span><span class="el-name">火</span><span class="el-age">10½ – 14岁 · 火态</span>
+    </button>
+  </div>
+
+  <div class="placeholder" id="empty">请选择一个元素，开启教练钥匙。</div>
+  <div id="panels"></div>
+</main>
+
+<footer>传记艺术教练认证（BBAC）&nbsp;·&nbsp; Prof. Hildrun Rolff &nbsp;·&nbsp; earth-s institute</footer>
+
+<script>
+
+// ── SVG ILLUSTRATIONS ─────────────────────────────────────────────────────────
+
+const SVG = {
+
+  // HEAD-BODY PROPORTION FIGURES — one SVG per element showing the developmental stage
+  proportion: {
+    earth: `<svg width="280" height="160" viewBox="0 0 280 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Phase 1: toddler ~3 heads tall -->
+      <!-- head -->
+      <circle cx="60" cy="28" r="22" stroke="#7A5C3A" stroke-width="2" fill="#F5EDE0"/>
+      <!-- face dots -->
+      <circle cx="53" cy="26" r="2" fill="#7A5C3A"/>
+      <circle cx="67" cy="26" r="2" fill="#7A5C3A"/>
+      <path d="M54 33 Q60 38 66 33" stroke="#7A5C3A" stroke-width="1.5" fill="none"/>
+      <!-- neck -->
+      <line x1="60" y1="50" x2="60" y2="58" stroke="#7A5C3A" stroke-width="2"/>
+      <!-- body — short, wide -->
+      <rect x="44" y="58" width="32" height="30" rx="4" stroke="#7A5C3A" stroke-width="2" fill="#F5EDE0"/>
+      <!-- arms -->
+      <line x1="44" y1="65" x2="28" y2="80" stroke="#7A5C3A" stroke-width="2"/>
+      <line x1="76" y1="65" x2="92" y2="80" stroke="#7A5C3A" stroke-width="2"/>
+      <!-- legs — short -->
+      <line x1="52" y1="88" x2="48" y2="116" stroke="#7A5C3A" stroke-width="2"/>
+      <line x1="68" y1="88" x2="72" y2="116" stroke="#7A5C3A" stroke-width="2"/>
+      <!-- feet -->
+      <line x1="44" y1="116" x2="52" y2="116" stroke="#7A5C3A" stroke-width="2"/>
+      <line x1="68" y1="116" x2="76" y2="116" stroke="#7A5C3A" stroke-width="2"/>
+      <!-- proportion guide lines -->
+      <line x1="100" y1="6" x2="100" y2="116" stroke="#C4A882" stroke-width="0.5" stroke-dasharray="3,3"/>
+      <text x="108" y="28" font-family="Georgia,serif" font-size="9" fill="#7A5C3A">头部</text>
+      <line x1="104" y1="6" x2="112" y2="6" stroke="#C4A882" stroke-width="0.5"/>
+      <line x1="104" y1="50" x2="112" y2="50" stroke="#C4A882" stroke-width="0.5"/>
+      <line x1="104" y1="50" x2="112" y2="50" stroke="#C4A882" stroke-width="0.5"/>
+      <line x1="104" y1="116" x2="112" y2="116" stroke="#C4A882" stroke-width="0.5"/>
+      <text x="108" y="88" font-family="Georgia,serif" font-size="9" fill="#7A5C3A">身体</text>
+      <!-- label -->
+      <text x="30" y="140" font-family="Georgia,serif" font-size="11" fill="#7A5C3A" font-style="italic">3–4个头身高度</text>
+      <!-- bracket showing ratio -->
+      <text x="30" y="153" font-family="Georgia,serif" font-size="10" fill="#C4A882">幼儿 · 第一阶段</text>
+    </svg>`,
+
+    water: `<svg width="280" height="160" viewBox="0 0 280 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Phase 2: child ~5 heads tall -->
+      <circle cx="60" cy="20" r="17" stroke="#2A5F7A" stroke-width="2" fill="#E0EEF5"/>
+      <circle cx="54" cy="18" r="1.5" fill="#2A5F7A"/>
+      <circle cx="66" cy="18" r="1.5" fill="#2A5F7A"/>
+      <path d="M55 24 Q60 28 65 24" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <line x1="60" y1="37" x2="60" y2="44" stroke="#2A5F7A" stroke-width="2"/>
+      <!-- body — more elongated -->
+      <rect x="46" y="44" width="28" height="34" rx="3" stroke="#2A5F7A" stroke-width="2" fill="#E0EEF5"/>
+      <!-- arms — reaching out, suggesting connection -->
+      <line x1="46" y1="52" x2="26" y2="64" stroke="#2A5F7A" stroke-width="2"/>
+      <line x1="74" y1="52" x2="94" y2="64" stroke="#2A5F7A" stroke-width="2"/>
+      <circle cx="26" cy="64" r="3" fill="#2A5F7A"/>
+      <circle cx="94" cy="64" r="3" fill="#2A5F7A"/>
+      <!-- legs — longer -->
+      <line x1="53" y1="78" x2="49" y2="116" stroke="#2A5F7A" stroke-width="2"/>
+      <line x1="67" y1="78" x2="71" y2="116" stroke="#2A5F7A" stroke-width="2"/>
+      <line x1="45" y1="116" x2="53" y2="116" stroke="#2A5F7A" stroke-width="2"/>
+      <line x1="67" y1="116" x2="75" y2="116" stroke="#2A5F7A" stroke-width="2"/>
+      <text x="28" y="140" font-family="Georgia,serif" font-size="11" fill="#2A5F7A" font-style="italic">5–6个头身高度</text>
+      <text x="28" y="153" font-family="Georgia,serif" font-size="10" fill="#6EA8C4">儿童 · 第二阶段</text>
+    </svg>`,
+
+    air: `<svg width="280" height="160" viewBox="0 0 280 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Phase 3: older child ~6–7 heads — figure leaping, body leaving ground -->
+      <circle cx="60" cy="16" r="14" stroke="#3A6B4E" stroke-width="2" fill="#E0F0E8"/>
+      <circle cx="55" cy="14" r="1.5" fill="#3A6B4E"/>
+      <circle cx="65" cy="14" r="1.5" fill="#3A6B4E"/>
+      <path d="M55 20 Q60 24 65 20" stroke="#3A6B4E" stroke-width="1.5" fill="none"/>
+      <line x1="60" y1="30" x2="60" y2="38" stroke="#3A6B4E" stroke-width="2"/>
+      <!-- body tilted — in motion -->
+      <rect x="47" y="38" width="26" height="30" rx="3" stroke="#3A6B4E" stroke-width="2" fill="#E0F0E8" transform="rotate(-5 60 53)"/>
+      <!-- arms wide — balance -->
+      <line x1="46" y1="46" x2="18" y2="38" stroke="#3A6B4E" stroke-width="2"/>
+      <line x1="74" y1="46" x2="102" y2="38" stroke="#3A6B4E" stroke-width="2"/>
+      <!-- legs — one raised (jumping) -->
+      <line x1="53" y1="68" x2="44" y2="100" stroke="#3A6B4E" stroke-width="2"/>
+      <line x1="67" y1="68" x2="82" y2="92" stroke="#3A6B4E" stroke-width="2"/>
+      <line x1="40" y1="100" x2="48" y2="100" stroke="#3A6B4E" stroke-width="2"/>
+      <!-- ground line with gap -->
+      <line x1="20" y1="116" x2="110" y2="116" stroke="#3A6B4E" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <!-- space between feet and ground -->
+      <text x="25" y="140" font-family="Georgia,serif" font-size="11" fill="#3A6B4E" font-style="italic">6–7个头身高度</text>
+      <text x="25" y="153" font-family="Georgia,serif" font-size="10" fill="#7CB896">大童 · 第三阶段</text>
+    </svg>`,
+
+    fire: `<svg width="280" height="160" viewBox="0 0 280 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Phase 4: adolescent ~7–8 heads — individuated posture -->
+      <circle cx="60" cy="13" r="12" stroke="#A83A18" stroke-width="2" fill="#F5E8E0"/>
+      <circle cx="55" cy="11" r="1.5" fill="#A83A18"/>
+      <circle cx="65" cy="11" r="1.5" fill="#A83A18"/>
+      <!-- strong expression — defined mouth -->
+      <path d="M55 17 Q60 21 65 17" stroke="#A83A18" stroke-width="1.5" fill="none"/>
+      <!-- spiky hair suggesting individuation -->
+      <path d="M50 8 L47 2 L53 7 L52 1 L58 6 L60 0 L62 6 L68 1 L67 7 L73 2 L70 8" stroke="#A83A18" stroke-width="1.5" fill="none"/>
+      <line x1="60" y1="25" x2="60" y2="33" stroke="#A83A18" stroke-width="2"/>
+      <!-- taller body -->
+      <rect x="48" y="33" width="24" height="36" rx="3" stroke="#A83A18" stroke-width="2" fill="#F5E8E0"/>
+      <!-- arms — one up (energy), one akimbo -->
+      <line x1="48" y1="42" x2="28" y2="28" stroke="#A83A18" stroke-width="2"/>
+      <line x1="72" y1="42" x2="90" y2="55" stroke="#A83A18" stroke-width="2"/>
+      <!-- long legs -->
+      <line x1="55" y1="69" x2="50" y2="116" stroke="#A83A18" stroke-width="2"/>
+      <line x1="65" y1="69" x2="70" y2="116" stroke="#A83A18" stroke-width="2"/>
+      <line x1="44" y1="116" x2="56" y2="116" stroke="#A83A18" stroke-width="2"/>
+      <line x1="64" y1="116" x2="76" y2="116" stroke="#A83A18" stroke-width="2"/>
+      <text x="25" y="140" font-family="Georgia,serif" font-size="11" fill="#A83A18" font-style="italic">7–8个头身高度</text>
+      <text x="25" y="153" font-family="Georgia,serif" font-size="10" fill="#D4784A">青少年 · 第四阶段</text>
+    </svg>`,
+  },
+
+  // CHILDREN'S DRAWING SIGNATURES
+  drawing: {
+    earth: `<svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Circle → Spiral: Phase 1 signature -->
+      <!-- bold enclosing circle -->
+      <circle cx="70" cy="70" r="45" stroke="#7A5C3A" stroke-width="3" fill="none"/>
+      <!-- inner spiral suggestion -->
+      <path d="M70 40 C90 40 100 55 100 70 C100 88 87 98 70 98 C50 98 38 85 42 68 C46 52 60 46 70 50 C80 54 84 64 80 72" stroke="#7A5C3A" stroke-width="1.5" fill="none" stroke-dasharray="2,2"/>
+      <!-- arrow showing circle→spiral transition -->
+      <path d="M125 50 L145 50" stroke="#C4A882" stroke-width="1.5" marker-end="url(#arr-earth)"/>
+      <defs><marker id="arr-earth" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#C4A882"/></marker></defs>
+      <!-- spiral -->
+      <path d="M162 70 C162 56 152 46 140 48 C128 50 122 62 126 74 C130 84 142 88 152 84" stroke="#7A5C3A" stroke-width="2" fill="none"/>
+      <text x="10" y="145" font-family="Georgia,serif" font-size="11" fill="#7A5C3A" font-style="italic">圆形 → 螺旋形</text>
+      <text x="10" y="158" font-family="Georgia,serif" font-size="10" fill="#C4A882">自我边界 · 容纳</text>
+    </svg>`,
+
+    water: `<svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Repetitions with variations: rows of shapes, slightly different each time -->
+      <circle cx="20" cy="30" r="8" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <circle cx="45" cy="28" r="9" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <circle cx="72" cy="31" r="7" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <circle cx="96" cy="29" r="10" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <circle cx="123" cy="30" r="8" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <circle cx="150" cy="27" r="9" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <circle cx="178" cy="31" r="7" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <!-- second row — triangles variation -->
+      <path d="M12 62 L20 48 L28 62 Z" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <path d="M38 64 L48 47 L58 64 Z" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <path d="M66 61 L74 49 L82 61 Z" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <path d="M92 63 L104 46 L116 63 Z" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <path d="M124 62 L134 48 L144 62 Z" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <path d="M152 64 L162 48 L172 64 Z" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <!-- connecting wavy line -->
+      <path d="M10 90 C30 82 50 98 70 90 C90 82 110 98 130 90 C150 82 170 98 190 90" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <text x="10" y="118" font-family="Georgia,serif" font-size="11" fill="#2A5F7A" font-style="italic">重复 · 变化</text>
+      <text x="10" y="131" font-family="Georgia,serif" font-size="10" fill="#6EA8C4">节奏 · 连接</text>
+    </svg>`,
+
+    air: `<svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Single figure in vast expanse — I in space -->
+      <!-- ground line very low -->
+      <line x1="0" y1="128" x2="200" y2="128" stroke="#3A6B4E" stroke-width="0.5"/>
+      <!-- tiny figure -->
+      <circle cx="100" cy="108" r="6" stroke="#3A6B4E" stroke-width="1.5" fill="none"/>
+      <line x1="100" y1="114" x2="100" y2="124" stroke="#3A6B4E" stroke-width="1.5"/>
+      <line x1="92" y1="118" x2="108" y2="118" stroke="#3A6B4E" stroke-width="1.5"/>
+      <line x1="100" y1="124" x2="96" y2="128" stroke="#3A6B4E" stroke-width="1.5"/>
+      <line x1="100" y1="124" x2="104" y2="128" stroke="#3A6B4E" stroke-width="1.5"/>
+      <!-- vast sky — just space, a few dots for stars/birds -->
+      <circle cx="30" cy="20" r="1.5" fill="#3A6B4E" opacity="0.4"/>
+      <circle cx="170" cy="35" r="1" fill="#3A6B4E" opacity="0.3"/>
+      <circle cx="60" cy="50" r="1" fill="#3A6B4E" opacity="0.3"/>
+      <circle cx="150" cy="15" r="1.5" fill="#3A6B4E" opacity="0.4"/>
+      <!-- horizon suggestion — very subtle -->
+      <line x1="0" y1="90" x2="200" y2="90" stroke="#3A6B4E" stroke-width="0.3" stroke-dasharray="1,8"/>
+      <!-- breadth arrows -->
+      <path d="M10 70 L10 128" stroke="#7CB896" stroke-width="0.5" stroke-dasharray="3,3"/>
+      <path d="M190 70 L190 128" stroke="#7CB896" stroke-width="0.5" stroke-dasharray="3,3"/>
+      <text x="10" y="148" font-family="Georgia,serif" font-size="11" fill="#3A6B4E" font-style="italic">广阔空间中的单一人物</text>
+      <text x="10" y="160" font-family="Georgia,serif" font-size="10" fill="#7CB896">我在空间中 · 透视</text>
+    </svg>`,
+
+    fire: `<svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Symbol and penetration — every surface filled, dense marks, personal symbols -->
+      <!-- dense background hatching -->
+      <line x1="0" y1="10" x2="200" y2="10" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="0" y1="20" x2="200" y2="20" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="0" y1="30" x2="200" y2="30" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="0" y1="40" x2="200" y2="40" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="0" y1="50" x2="200" y2="50" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="10" y1="0" x2="10" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="30" y1="0" x2="30" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="50" y1="0" x2="50" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="70" y1="0" x2="70" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="90" y1="0" x2="90" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="110" y1="0" x2="110" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="130" y1="0" x2="130" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="150" y1="0" x2="150" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="170" y1="0" x2="170" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <line x1="190" y1="0" x2="190" y2="120" stroke="#A83A18" stroke-width="0.3" opacity="0.2"/>
+      <!-- personal symbols over the grid -->
+      <path d="M20 55 L35 20 L50 55 Z" stroke="#A83A18" stroke-width="2" fill="none"/>
+      <circle cx="80" cy="35" r="18" stroke="#A83A18" stroke-width="2" fill="none"/>
+      <path d="M80 17 L80 53 M62 35 L98 35" stroke="#A83A18" stroke-width="1.5"/>
+      <path d="M115 60 L130 20 L145 60 L115 40 L145 40 Z" stroke="#A83A18" stroke-width="1.5" fill="none"/>
+      <path d="M165 55 C165 42 155 28 165 18 C175 28 172 42 165 55" stroke="#A83A18" stroke-width="2" fill="none"/>
+      <!-- small details filling every corner -->
+      <circle cx="8" cy="8" r="3" fill="#A83A18" opacity="0.4"/>
+      <circle cx="192" cy="8" r="2" fill="#A83A18" opacity="0.3"/>
+      <circle cx="8" cy="112" r="2" fill="#A83A18" opacity="0.3"/>
+      <circle cx="192" cy="112" r="3" fill="#A83A18" opacity="0.4"/>
+      <text x="10" y="140" font-family="Georgia,serif" font-size="11" fill="#A83A18" font-style="italic">符号 · 渗透</text>
+      <text x="10" y="153" font-family="Georgia,serif" font-size="10" fill="#D4784A">每个表面都被填满 · 个人语言</text>
+    </svg>`,
+  },
+
+  // SCHEMA PLAY SKETCHES
+  schema: {
+    earth: `<svg width="240" height="150" viewBox="0 0 240 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Stacking: tower of blocks with figure pressing down -->
+      <!-- figure -->
+      <circle cx="60" cy="18" r="10" stroke="#7A5C3A" stroke-width="2" fill="none"/>
+      <line x1="60" y1="28" x2="60" y2="50" stroke="#7A5C3A" stroke-width="2"/>
+      <line x1="40" y1="38" x2="80" y2="38" stroke="#7A5C3A" stroke-width="2"/>
+      <line x1="60" y1="50" x2="50" y2="68" stroke="#7A5C3A" stroke-width="2"/>
+      <line x1="60" y1="50" x2="70" y2="68" stroke="#7A5C3A" stroke-width="2"/>
+      <!-- arms pushing down on blocks -->
+      <path d="M40 38 L30 55 L50 55" stroke="#7A5C3A" stroke-width="1.5" fill="none"/>
+      <path d="M80 38 L90 55 L70 55" stroke="#7A5C3A" stroke-width="1.5" fill="none"/>
+      <!-- stacked blocks -->
+      <rect x="34" y="68" width="52" height="14" rx="1" stroke="#7A5C3A" stroke-width="2" fill="#F5EDE0"/>
+      <rect x="28" y="82" width="64" height="14" rx="1" stroke="#7A5C3A" stroke-width="2" fill="#F5EDE0"/>
+      <rect x="22" y="96" width="76" height="14" rx="1" stroke="#7A5C3A" stroke-width="2" fill="#F5EDE0"/>
+      <!-- ground weight lines -->
+      <line x1="10" y1="115" x2="110" y2="115" stroke="#7A5C3A" stroke-width="2"/>
+      <!-- down arrows showing gravity/weight -->
+      <path d="M60 55 L60 64" stroke="#C4A882" stroke-width="1" marker-end="url(#down-e)"/>
+      <defs><marker id="down-e" markerWidth="5" markerHeight="5" refX="2.5" refY="5" orient="auto"><path d="M0,0 L2.5,5 L5,0" fill="#C4A882"/></marker></defs>
+      <!-- second sketch: digging -->
+      <line x1="160" y1="110" x2="240" y2="110" stroke="#7A5C3A" stroke-width="1.5"/>
+      <!-- soil marks -->
+      <path d="M170 108 C175 100 180 108 185 100 C190 108 195 100 200 108 C205 100 210 108 215 100 C220 108 225 100 230 108" stroke="#7A5C3A" stroke-width="1" fill="none" opacity="0.5"/>
+      <!-- spade -->
+      <line x1="195" y1="75" x2="195" y2="108" stroke="#7A5C3A" stroke-width="2"/>
+      <path d="M185 100 L195 110 L205 100 L200 88 L190 88 Z" stroke="#7A5C3A" stroke-width="1.5" fill="#F5EDE0"/>
+      <text x="10" y="138" font-family="Georgia,serif" font-size="11" fill="#7A5C3A" font-style="italic">堆叠 · 按压 · 挖掘</text>
+    </svg>`,
+
+    water: `<svg width="240" height="150" viewBox="0 0 240 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Flowing: figure in circular motion + connecting thread -->
+      <!-- circular movement path -->
+      <ellipse cx="70" cy="70" rx="45" ry="30" stroke="#2A5F7A" stroke-width="1" fill="none" stroke-dasharray="4,3"/>
+      <!-- figure running in circle -->
+      <circle cx="70" cy="40" r="9" stroke="#2A5F7A" stroke-width="2" fill="none"/>
+      <line x1="70" y1="49" x2="70" y2="64" stroke="#2A5F7A" stroke-width="2"/>
+      <line x1="55" y1="56" x2="85" y2="56" stroke="#2A5F7A" stroke-width="2"/>
+      <line x1="70" y1="64" x2="62" y2="78" stroke="#2A5F7A" stroke-width="2"/>
+      <line x1="70" y1="64" x2="78" y2="78" stroke="#2A5F7A" stroke-width="2"/>
+      <!-- motion arc arrow -->
+      <path d="M100 55 Q118 35 115 70" stroke="#2A5F7A" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+      <path d="M113 70 L115 70 L114 62" stroke="#2A5F7A" stroke-width="1.5"/>
+      <!-- second sketch: thread connecting two hands -->
+      <circle cx="148" cy="50" r="7" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <circle cx="148" cy="110" r="7" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <!-- thread between them in wavy line -->
+      <path d="M148 57 C138 65 158 72 148 80 C138 88 158 95 148 103" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <!-- water flow lines -->
+      <path d="M170 40 C185 48 175 58 190 65 C205 72 195 82 210 88" stroke="#2A5F7A" stroke-width="1.5" fill="none" opacity="0.5"/>
+      <path d="M178 35 C193 43 183 53 198 60 C213 67 203 77 218 83" stroke="#2A5F7A" stroke-width="1" fill="none" opacity="0.3"/>
+      <text x="10" y="138" font-family="Georgia,serif" font-size="11" fill="#2A5F7A" font-style="italic">圆周运动 · 连接 · 流动</text>
+    </svg>`,
+
+    air: `<svg width="240" height="150" viewBox="0 0 240 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Balancing: figure on a beam + kite -->
+      <!-- balance beam -->
+      <line x1="20" y1="100" x2="120" y2="100" stroke="#3A6B4E" stroke-width="2"/>
+      <!-- pivot triangle -->
+      <path d="M60 100 L50 116 L70 116 Z" stroke="#3A6B4E" stroke-width="1.5" fill="none"/>
+      <!-- figure balancing — arms wide -->
+      <circle cx="60" cy="78" r="9" stroke="#3A6B4E" stroke-width="2" fill="none"/>
+      <line x1="60" y1="87" x2="60" y2="100" stroke="#3A6B4E" stroke-width="2"/>
+      <line x1="28" y1="90" x2="92" y2="90" stroke="#3A6B4E" stroke-width="2"/>
+      <line x1="60" y1="100" x2="52" y2="116" stroke="#3A6B4E" stroke-width="2"/>
+      <line x1="60" y1="100" x2="68" y2="116" stroke="#3A6B4E" stroke-width="2"/>
+      <!-- kite in sky -->
+      <path d="M170 20 L185 40 L170 55 L155 40 Z" stroke="#3A6B4E" stroke-width="2" fill="#E0F0E8"/>
+      <!-- kite string in S-curve -->
+      <path d="M170 55 C175 70 165 80 170 95 C175 108 168 118 165 128" stroke="#3A6B4E" stroke-width="1.5" fill="none"/>
+      <!-- wind lines -->
+      <path d="M140 30 L155 30" stroke="#3A6B4E" stroke-width="1" opacity="0.4"/>
+      <path d="M138 40 L150 40" stroke="#3A6B4E" stroke-width="1" opacity="0.3"/>
+      <path d="M142 50 L152 50" stroke="#3A6B4E" stroke-width="1" opacity="0.2"/>
+      <!-- upward arrow showing height aspiration -->
+      <path d="M210 90 L210 25" stroke="#7CB896" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#up-a)"/>
+      <defs><marker id="up-a" markerWidth="5" markerHeight="5" refX="2.5" refY="0" orient="auto"><path d="M0,5 L2.5,0 L5,5" fill="#7CB896"/></marker></defs>
+      <text x="10" y="140" font-family="Georgia,serif" font-size="11" fill="#3A6B4E" font-style="italic">保持平衡 · 高度 · 放风筝</text>
+    </svg>`,
+
+    fire: `<svg width="240" height="150" viewBox="0 0 240 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Destroying/rebuilding: ruins + new construction -->
+      <!-- destroyed structure left -->
+      <rect x="15" y="60" width="20" height="40" rx="1" stroke="#A83A18" stroke-width="1.5" fill="none" transform="rotate(12 25 80)"/>
+      <rect x="40" y="50" width="18" height="50" rx="1" stroke="#A83A18" stroke-width="1.5" fill="none" transform="rotate(-8 49 75)"/>
+      <!-- rubble -->
+      <rect x="20" y="96" width="8" height="6" rx="1" stroke="#A83A18" stroke-width="1" fill="none" transform="rotate(20 24 99)"/>
+      <rect x="35" y="98" width="10" height="5" rx="1" stroke="#A83A18" stroke-width="1" fill="none" transform="rotate(-15 40 100)"/>
+      <!-- arrow of transformation -->
+      <path d="M80 75 L105 75" stroke="#A83A18" stroke-width="2" marker-end="url(#arr-f)"/>
+      <defs><marker id="arr-f" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#A83A18"/></marker></defs>
+      <!-- fire sparks above arrow -->
+      <path d="M90 65 C88 58 93 52 90 45" stroke="#D4784A" stroke-width="1.5" fill="none"/>
+      <path d="M92 63 C95 56 90 50 93 44" stroke="#D4784A" stroke-width="1" fill="none"/>
+      <!-- new structure right — clean and upright -->
+      <rect x="115" y="55" width="22" height="45" rx="2" stroke="#A83A18" stroke-width="2" fill="#F5E8E0"/>
+      <rect x="140" y="65" width="22" height="35" rx="2" stroke="#A83A18" stroke-width="2" fill="#F5E8E0"/>
+      <rect x="165" y="45" width="22" height="55" rx="2" stroke="#A83A18" stroke-width="2" fill="#F5E8E0"/>
+      <!-- energy lines radiating -->
+      <path d="M196 60 L210 48" stroke="#D4784A" stroke-width="1" opacity="0.6"/>
+      <path d="M198 68 L214 65" stroke="#D4784A" stroke-width="1" opacity="0.5"/>
+      <path d="M196 76 L210 84" stroke="#D4784A" stroke-width="1" opacity="0.4"/>
+      <!-- ground -->
+      <line x1="10" y1="105" x2="230" y2="105" stroke="#A83A18" stroke-width="1.5"/>
+      <text x="10" y="126" font-family="Georgia,serif" font-size="11" fill="#A83A18" font-style="italic">破坏 · 重建 · 转化</text>
+    </svg>`,
+  },
+
+  // SPORT / ACTIVITY SILHOUETTES
+  sport: {
+    earth: `<svg width="280" height="160" viewBox="0 0 280 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Weightlifter left -->
+      <circle cx="45" cy="22" r="10" stroke="#7A5C3A" stroke-width="2" fill="none"/>
+      <!-- wide stance, bent knees, arms up with bar -->
+      <line x1="45" y1="32" x2="45" y2="55" stroke="#7A5C3A" stroke-width="2.5"/>
+      <!-- bent knees -->
+      <line x1="45" y1="55" x2="32" y2="72" stroke="#7A5C3A" stroke-width="2.5"/>
+      <line x1="45" y1="55" x2="58" y2="72" stroke="#7A5C3A" stroke-width="2.5"/>
+      <line x1="32" y1="72" x2="28" y2="90" stroke="#7A5C3A" stroke-width="2.5"/>
+      <line x1="58" y1="72" x2="62" y2="90" stroke="#7A5C3A" stroke-width="2.5"/>
+      <!-- arms up -->
+      <line x1="35" y1="42" x2="12" y2="30" stroke="#7A5C3A" stroke-width="2.5"/>
+      <line x1="55" y1="42" x2="78" y2="30" stroke="#7A5C3A" stroke-width="2.5"/>
+      <!-- barbell -->
+      <line x1="5" y1="28" x2="85" y2="28" stroke="#7A5C3A" stroke-width="3"/>
+      <circle cx="5" cy="28" r="7" stroke="#7A5C3A" stroke-width="2" fill="#F5EDE0"/>
+      <circle cx="85" cy="28" r="7" stroke="#7A5C3A" stroke-width="2" fill="#F5EDE0"/>
+      <!-- ground -->
+      <line x1="10" y1="92" x2="90" y2="92" stroke="#7A5C3A" stroke-width="1.5"/>
+
+      <!-- Potter / clay worker right -->
+      <circle cx="200" cy="22" r="10" stroke="#7A5C3A" stroke-width="2" fill="none"/>
+      <line x1="200" y1="32" x2="200" y2="60" stroke="#7A5C3A" stroke-width="2"/>
+      <!-- arms curved forward over wheel -->
+      <path d="M185 45 C178 55 178 68 188 72" stroke="#7A5C3A" stroke-width="2" fill="none"/>
+      <path d="M215 45 C222 55 222 68 212 72" stroke="#7A5C3A" stroke-width="2" fill="none"/>
+      <!-- potter's wheel -->
+      <ellipse cx="200" cy="82" rx="24" ry="8" stroke="#7A5C3A" stroke-width="2" fill="#F5EDE0"/>
+      <!-- clay on wheel -->
+      <path d="M190 80 C190 70 210 70 210 80" stroke="#7A5C3A" stroke-width="1.5" fill="none"/>
+      <!-- seated position -->
+      <line x1="200" y1="60" x2="185" y2="78" stroke="#7A5C3A" stroke-width="2"/>
+      <line x1="200" y1="60" x2="215" y2="78" stroke="#7A5C3A" stroke-width="2"/>
+      <!-- stool -->
+      <line x1="182" y1="78" x2="218" y2="78" stroke="#7A5C3A" stroke-width="1.5"/>
+      <line x1="186" y1="78" x2="184" y2="94" stroke="#7A5C3A" stroke-width="1.5"/>
+      <line x1="214" y1="78" x2="216" y2="94" stroke="#7A5C3A" stroke-width="1.5"/>
+
+      <text x="10" y="118" font-family="Georgia,serif" font-size="11" fill="#7A5C3A" font-style="italic">举重 · 陶艺</text>
+      <text x="10" y="132" font-family="Georgia,serif" font-size="10" fill="#C4A882">阻力 · 按压 · 重量</text>
+    </svg>`,
+
+    water: `<svg width="280" height="160" viewBox="0 0 280 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Sailor / sailing left -->
+      <!-- hull -->
+      <path d="M20 95 C20 105 80 108 80 95" stroke="#2A5F7A" stroke-width="2" fill="#E0EEF5"/>
+      <!-- mast -->
+      <line x1="50" y1="40" x2="50" y2="95" stroke="#2A5F7A" stroke-width="2"/>
+      <!-- sail — billowing -->
+      <path d="M50 42 C72 48 76 72 50 80" stroke="#2A5F7A" stroke-width="2" fill="#E0EEF5"/>
+      <!-- boom -->
+      <line x1="50" y1="80" x2="78" y2="90" stroke="#2A5F7A" stroke-width="1.5"/>
+      <!-- figure at helm -->
+      <circle cx="32" cy="83" r="7" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+      <line x1="32" y1="90" x2="32" y2="95" stroke="#2A5F7A" stroke-width="1.5"/>
+      <line x1="22" y1="85" x2="42" y2="85" stroke="#2A5F7A" stroke-width="1.5"/>
+      <!-- waves -->
+      <path d="M10 108 C20 102 30 112 40 106 C50 100 60 112 70 106 C80 100 90 110 100 106" stroke="#2A5F7A" stroke-width="1.5" fill="none"/>
+
+      <!-- Dancer right — flowing movement -->
+      <circle cx="200" cy="30" r="10" stroke="#2A5F7A" stroke-width="2" fill="none"/>
+      <line x1="200" y1="40" x2="200" y2="62" stroke="#2A5F7A" stroke-width="2"/>
+      <!-- arms in flowing arc -->
+      <path d="M200 48 C185 38 172 42 165 52" stroke="#2A5F7A" stroke-width="2" fill="none"/>
+      <path d="M200 48 C215 38 228 42 235 52" stroke="#2A5F7A" stroke-width="2" fill="none"/>
+      <!-- one leg extended, other bent -->
+      <line x1="200" y1="62" x2="185" y2="82" stroke="#2A5F7A" stroke-width="2"/>
+      <path d="M200 62 C210 72 228 68 236 76" stroke="#2A5F7A" stroke-width="2" fill="none"/>
+      <!-- flow lines around dancer -->
+      <path d="M155 60 C158 50 162 55 160 65" stroke="#6EA8C4" stroke-width="1" fill="none" opacity="0.5"/>
+      <path d="M240 58 C237 48 233 53 236 63" stroke="#6EA8C4" stroke-width="1" fill="none" opacity="0.5"/>
+
+      <text x="10" y="130" font-family="Georgia,serif" font-size="11" fill="#2A5F7A" font-style="italic">帆船 · 舞蹈</text>
+      <text x="10" y="144" font-family="Georgia,serif" font-size="10" fill="#6EA8C4">流动 · 节奏 · 连接</text>
+    </svg>`,
+
+    air: `<svg width="280" height="160" viewBox="0 0 280 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Paraglider left -->
+      <!-- canopy — large arc -->
+      <path d="M15 55 C15 20 95 15 95 50" stroke="#3A6B4E" stroke-width="2" fill="#E0F0E8" opacity="0.8"/>
+      <!-- lines from canopy to harness -->
+      <line x1="25" y1="52" x2="52" y2="88" stroke="#3A6B4E" stroke-width="1"/>
+      <line x1="40" y1="40" x2="52" y2="88" stroke="#3A6B4E" stroke-width="1"/>
+      <line x1="60" y1="32" x2="55" y2="88" stroke="#3A6B4E" stroke-width="1"/>
+      <line x1="80" y1="38" x2="58" y2="88" stroke="#3A6B4E" stroke-width="1"/>
+      <line x1="90" y1="50" x2="62" y2="88" stroke="#3A6B4E" stroke-width="1"/>
+      <!-- harness / seated figure -->
+      <circle cx="57" cy="80" r="8" stroke="#3A6B4E" stroke-width="2" fill="none"/>
+      <path d="M50 88 L44 100 L70 100 L64 88" stroke="#3A6B4E" stroke-width="1.5" fill="#E0F0E8"/>
+      <!-- legs dangling -->
+      <line x1="50" y1="100" x2="46" y2="114" stroke="#3A6B4E" stroke-width="1.5"/>
+      <line x1="64" y1="100" x2="68" y2="114" stroke="#3A6B4E" stroke-width="1.5"/>
+      <!-- horizon far below -->
+      <line x1="0" y1="130" x2="120" y2="130" stroke="#3A6B4E" stroke-width="0.5" stroke-dasharray="2,4"/>
+
+      <!-- Climber right — on rock face -->
+      <!-- rock face -->
+      <path d="M160 10 L200 5 L230 20 L240 80 L220 130 L160 125 Z" stroke="#3A6B4E" stroke-width="1.5" fill="#E0F0E8" opacity="0.5"/>
+      <!-- climbing figure -->
+      <circle cx="195" cy="55" r="8" stroke="#3A6B4E" stroke-width="2" fill="none"/>
+      <!-- body against wall -->
+      <line x1="195" y1="63" x2="195" y2="82" stroke="#3A6B4E" stroke-width="2"/>
+      <!-- arms reaching up to holds -->
+      <line x1="186" y1="68" x2="175" y2="48" stroke="#3A6B4E" stroke-width="2"/>
+      <line x1="204" y1="68" x2="218" y2="46" stroke="#3A6B4E" stroke-width="2"/>
+      <!-- hand holds -->
+      <circle cx="175" cy="48" r="3" fill="#3A6B4E"/>
+      <circle cx="218" cy="46" r="3" fill="#3A6B4E"/>
+      <!-- feet on footholds -->
+      <line x1="195" y1="82" x2="182" y2="96" stroke="#3A6B4E" stroke-width="2"/>
+      <line x1="195" y1="82" x2="208" y2="100" stroke="#3A6B4E" stroke-width="2"/>
+      <circle cx="182" cy="98" r="3" fill="#3A6B4E"/>
+      <circle cx="208" cy="102" r="3" fill="#3A6B4E"/>
+
+      <text x="10" y="148" font-family="Georgia,serif" font-size="11" fill="#3A6B4E" font-style="italic">滑翔伞 · 攀岩</text>
+      <text x="10" y="160" font-family="Georgia,serif" font-size="10" fill="#7CB896">高度 · 平衡 · 克服恐惧</text>
+    </svg>`,
+
+    fire: `<svg width="280" height="160" viewBox="0 0 280 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Blacksmith left — intense, forging -->
+      <!-- anvil -->
+      <rect x="20" y="88" width="50" height="14" rx="2" stroke="#A83A18" stroke-width="2" fill="#F5E8E0"/>
+      <rect x="28" y="102" width="34" height="8" rx="1" stroke="#A83A18" stroke-width="1.5" fill="#F5E8E0"/>
+      <!-- hot metal on anvil -->
+      <rect x="30" y="82" width="28" height="8" rx="1" stroke="#D4784A" stroke-width="1.5" fill="#F5E8E0"/>
+      <!-- sparks -->
+      <circle cx="44" cy="78" r="2" fill="#D4784A"/>
+      <circle cx="50" cy="74" r="1.5" fill="#D4784A" opacity="0.7"/>
+      <circle cx="56" cy="76" r="1" fill="#D4784A" opacity="0.5"/>
+      <circle cx="38" cy="72" r="1.5" fill="#D4784A" opacity="0.6"/>
+      <!-- figure with hammer raised -->
+      <circle cx="60" cy="32" r="10" stroke="#A83A18" stroke-width="2" fill="none"/>
+      <line x1="60" y1="42" x2="60" y2="65" stroke="#A83A18" stroke-width="2.5"/>
+      <!-- arm raised with hammer -->
+      <line x1="52" y1="52" x2="30" y2="32" stroke="#A83A18" stroke-width="2.5"/>
+      <!-- hammer -->
+      <rect x="18" y="22" width="18" height="10" rx="2" stroke="#A83A18" stroke-width="2" fill="#F5E8E0"/>
+      <line x1="52" y1="55" x2="68" y2="68" stroke="#A83A18" stroke-width="2"/>
+      <line x1="60" y1="65" x2="48" y2="82" stroke="#A83A18" stroke-width="2"/>
+      <line x1="60" y1="65" x2="72" y2="80" stroke="#A83A18" stroke-width="2"/>
+
+      <!-- Sprinter right — explosive energy -->
+      <circle cx="200" cy="30" r="10" stroke="#A83A18" stroke-width="2" fill="none"/>
+      <!-- leaning forward — explosive start -->
+      <line x1="200" y1="40" x2="205" y2="62" stroke="#A83A18" stroke-width="2.5"/>
+      <!-- power arm drive -->
+      <line x1="197" y1="50" x2="178" y2="38" stroke="#A83A18" stroke-width="2.5"/>
+      <line x1="208" y1="50" x2="228" y2="62" stroke="#A83A18" stroke-width="2.5"/>
+      <!-- legs in sprint stride — powerful -->
+      <line x1="205" y1="62" x2="188" y2="82" stroke="#A83A18" stroke-width="2.5"/>
+      <line x1="205" y1="62" x2="222" y2="76" stroke="#A83A18" stroke-width="2.5"/>
+      <line x1="188" y1="82" x2="182" y2="100" stroke="#A83A18" stroke-width="2.5"/>
+      <line x1="222" y1="76" x2="232" y2="94" stroke="#A83A18" stroke-width="2.5"/>
+      <!-- speed lines -->
+      <line x1="148" y1="55" x2="168" y2="55" stroke="#D4784A" stroke-width="1.5" opacity="0.6"/>
+      <line x1="145" y1="65" x2="165" y2="65" stroke="#D4784A" stroke-width="1" opacity="0.4"/>
+      <line x1="150" y1="75" x2="168" y2="75" stroke="#D4784A" stroke-width="1" opacity="0.3"/>
+      <!-- ground -->
+      <line x1="150" y1="104" x2="250" y2="104" stroke="#A83A18" stroke-width="1.5"/>
+
+      <text x="10" y="128" font-family="Georgia,serif" font-size="11" fill="#A83A18" font-style="italic">铁匠工艺 · 短跑</text>
+      <text x="10" y="142" font-family="Georgia,serif" font-size="10" fill="#D4784A">强度 · 转化 · 爆发</text>
+    </svg>`,
+  },
+};
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const DATA = {
+  earth: {
+    color: 'var(--earth)', light: 'var(--earth-light)', mid: 'var(--earth-mid)',
+    name: '土', phase: '出生 – 3½岁 · 固态／坚实',
+    system: '骨骼 · 大脑 · 神经',
+    resource: '我能移动沉重之物。我能坚持。我能产生影响。',
+    diagnostics: [
+      '儿童画：圆形占主导（约2½–3½岁）——在此阶段末期，圆形过渡为螺旋形。这是超越边界的第一步运动。',
+      '人物画：头部较大，身体紧凑，几乎没有动态——身体是质量，而非运动。',
+      '泥土工作：按压、敲击、压实——几乎不向外塑形。材料被牢牢掌控。',
+    ],
+    schemas: [
+      ['堆叠／建造', '塔楼、墙壁、积木建筑'],
+      ['搬运／拖拽', '石头、沙袋、重物'],
+      ['按压／锤击', '向地面按压、敲击、锤打'],
+      ['挖掘／分层', '泥土、沙子、泥浆、雪'],
+      ['寻找阻力', '靠着墙壁、支撑、挤压'],
+    ],
+    activities: [
+      ['堆叠／建造', '手工艺、建筑、烹饪、园艺'],
+      ['搬运／拖拽', '举重、爬山、家具修复'],
+      ['按压／锤击', '雕塑、陶艺、木工、按摩治疗'],
+      ['挖掘／分层', '园艺、烘焙、业余考古'],
+      ['寻找阻力', '攀岩、摔跤、武术、举重'],
+    ],
+    bridge: '您确切知道自己真正在场的那一刻是什么？',
+    questions: [
+      '当您真正精疲力竭时，您会做什么——什么真正能让您恢复？',
+      '有没有一种体育活动让您感到完全安全？',
+      '您上一次感觉「我比面对的事物更强大」是什么时候？',
+      '在您目前的处境中，您需要什么才能再次感到脚踏实地？',
+    ],
+  },
+  water: {
+    color: 'var(--water)', light: 'var(--water-light)', mid: 'var(--water-mid)',
+    name: '水', phase: '3½ – 7岁 · 液态',
+    system: '心脏 · 淋巴系统 · 循环',
+    resource: '我能感知事物何时开始流动。我跟随事物的牵引。我连接。',
+    diagnostics: [
+      '儿童画：有变化的重复——图案以细微变化重复出现。节奏与序列塑造画面。人物之间出现连接线。',
+      '人物画：人物处于运动状态，人物之间有连接，周围环境被纳入画中。',
+      '泥土工作：形态通过运动和重复产生。柔和的过渡，几乎没有硬边。',
+    ],
+    schemas: [
+      ['连接', '线条、绳索、链条、建造桥梁'],
+      ['圆周运动', '绕圈跑、旋转、打转'],
+      ['摆动／钟摆', '秋千、吊桥、绳索'],
+      ['节奏性重复', '摆放图案、敲击、唱歌'],
+      ['让其流动', '倒水、沙子流动、颜料流淌'],
+    ],
+    activities: [
+      ['连接', '人际网络、团队合作、调解、舞蹈'],
+      ['圆周运动', '舞蹈、太极、瑜伽、武术'],
+      ['摆动／钟摆', '帆船、攀岩、经由铁索攀登'],
+      ['节奏性重复', '音乐、歌唱、针线活、跑步'],
+      ['让其流动', '水彩画、即兴创作、自由写作'],
+    ],
+    bridge: '当您处于这种流动状态时，您的身体发生了什么变化？',
+    questions: [
+      '有没有一种活动让您完全沉浸其中——时间和努力都消失了？',
+      '您与谁真正相连——您如何在身体上感受到这一点？',
+      '您上一次感觉「这托着我，我不必挣扎」是什么时候？',
+      '在您目前的处境中，什么阻碍了流动——什么可能再次开启它？',
+    ],
+  },
+  air: {
+    color: 'var(--air)', light: 'var(--air-light)', mid: 'var(--air-mid)',
+    name: '气', phase: '7 – 10½岁 · 气态',
+    system: '肺部 · 呼吸 · 平衡',
+    resource: '我能看到情境之外。我找到自己的平衡点。我敢于放开地面。',
+    diagnostics: [
+      '儿童画：空间与透视出现。特征：辽阔空间中的单一人物——「我在空间中」。空白空间是有意义的，而非空洞。',
+      '人物画：可辨认的比例，人物处于空间中，有时有悬浮或跳跃的动态——身体离开地面。',
+      '泥土工作：形态向上建造，探索平衡，寻求不稳定的均衡。',
+    ],
+    schemas: [
+      ['保持平衡', '在墙上保持平衡、走钢索、叠石头'],
+      ['寻求高度', '攀爬、爬树、观景台'],
+      ['穿越／跨越', '克服障碍、桥梁、跳跃'],
+      ['与气玩耍', '放风筝、吹泡泡、吹气'],
+      ['克服恐惧', '跳入水中、冒险、测试极限'],
+    ],
+    activities: [
+      ['保持平衡', '冲浪、走钢索、瑜伽、体操'],
+      ['寻求高度', '攀岩、登山、建筑间高空走绳'],
+      ['穿越', '跑酷、田径、障碍赛'],
+      ['飞翔／气', '滑翔伞、跳伞、滑翔、唱歌'],
+      ['克服恐惧', '垂直极限运动、公开演讲、舞台表演'],
+    ],
+    bridge: '您上一次感觉真正能够全面看清一个处境是什么时候？',
+    questions: [
+      '有没有一种活动给您全局视野的感觉——让您能看得很远？',
+      '您上一次鼓起勇气做之前令您害怕的事是什么时候？',
+      '什么帮助您在困难处境中保持距离？',
+      '如果您从鸟瞰视角看待当前挑战——您可能会看到什么之前看不到的东西？',
+    ],
+  },
+  fire: {
+    color: 'var(--fire)', light: 'var(--fire-light)', mid: 'var(--fire-mid)',
+    name: '火', phase: '10½ – 14岁 · 火态',
+    system: '新陈代谢 · 转化',
+    resource: '我能从根本上改变某些事物。我有这种能量。我不害怕燃烧殆尽。',
+    diagnostics: [
+      '儿童画：符号与渗透——一切都被完全阐发，没有任何区域是空白或未经处理的。整个画面被渗透。个人图像语言出现。',
+      '人物画：高度个性化，个人风格出现，有时有意夸张或扭曲作为表达手段。',
+      '泥土工作：破坏与重建，材料被深刻改变，动作中有强烈能量——没有任何东西未被触及。',
+    ],
+    schemas: [
+      ['破坏／建造', '摧毁沙堡、拆除、重建'],
+      ['火与能量', '篝火、蜡烛、爆炸、烟火'],
+      ['秘密代码／仪式', '秘密语言、帮派、入会仪式'],
+      ['寻求强度', '冒险、极端体验、肾上腺素'],
+      ['观察转化', '烹饪、化学实验、熔化'],
+    ],
+    activities: [
+      ['破坏／建造', '装修、创业、危机管理'],
+      ['火与能量', '铁匠工艺、明火烹饪、烟火技术'],
+      ['仪式／代码', '灵性修行、武术、俱乐部文化'],
+      ['寻求强度', '极限运动、舞台表演、高风险决策'],
+      ['转化', '教练、治疗、研究、艺术'],
+    ],
+    bridge: '在您的处境中，什么需要燃烧——真正消失——才能让新事物出现？',
+    questions: [
+      '生活中有没有您长期想要改变但尚未改变的事情？',
+      '您上一次真正感到充满能量和决心是什么时候？',
+      '如果您简单地让旧事物燃烧殆尽，会发生什么？',
+      '哪种风险值得冒——如果您知道之后的事物会真正更好？',
+    ],
+  },
+};
+
+const TABS = ['诊断信号', '图式游戏', '当今喜爱的活动', '教练提问', '图示说明'];
+
+let currentEl = null;
+let currentTab = 0;
+
+function selectElement(id, btn) {
+  document.querySelectorAll('.element-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentEl = id;
+  currentTab = 0;
+  document.getElementById('empty').style.display = 'none';
+  renderPanel();
+}
+
+function renderPanel() {
+  const d = DATA[currentEl];
+  const container = document.getElementById('panels');
+  container.style.display = 'block';
+
+  container.innerHTML = `
+    <div class="panel visible"
+      style="--el-color:${d.color};--el-light:${d.light};--el-mid:${d.mid};">
+
+      <div class="panel-header">
+        <div>
+          <div class="panel-header-label">学习领域</div>
+          <div class="panel-system">${d.system}</div>
+          <div style="margin-top:10px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.2em;color:${d.color};opacity:0.7;">${d.phase}</div>
+        </div>
+        <div>
+          <div class="panel-header-label">核心资源</div>
+          <div class="panel-resource">"${d.resource}"</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        ${TABS.map((t,i) => `<button class="tab-btn ${i===currentTab?'active':''}" onclick="switchTab(${i})">${t}</button>`).join('')}
+      </div>
+
+      ${renderTab(0,d)}
+      ${renderTab(1,d)}
+      ${renderTab(2,d)}
+      ${renderTab(3,d)}
+      ${renderTab(4,d)}
+    </div>
+  `;
+}
+
+function renderTab(i, d) {
+  const vis = i === currentTab ? 'visible' : '';
+  const el = currentEl;
+
+  if (i === 0) return `
+    <div class="tab-content ${vis}" id="tab-0">
+      ${d.diagnostics.map((t,n) => `
+        <div class="diag-item">
+          <span class="diag-num">${n+1}</span>
+          <span class="diag-text">${t}</span>
+        </div>`).join('')}
+      <div class="convergence-box">
+        <div class="label">汇聚原则</div>
+        <p>当三个诊断情境都指向同一发展窗口时，这并非巧合——这是一个具有高度重要性的传记主题。</p>
+      </div>
+    </div>`;
+
+  if (i === 1) return `
+    <div class="tab-content ${vis}" id="tab-1">
+      <table class="data-table">
+        <thead><tr><th>图式游戏</th><th>表现形式／示例</th></tr></thead>
+        <tbody>${d.schemas.map(([a,b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+
+  if (i === 2) return `
+    <div class="tab-content ${vis}" id="tab-2">
+      <table class="data-table">
+        <thead><tr><th>图式游戏</th><th>当今喜爱的活动</th></tr></thead>
+        <tbody>${d.activities.map(([a,b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</tbody>
+      </table>
+      <div class="bridge-box">
+        <div class="label">桥接问题</div>
+        <p>「${d.bridge}」</p>
+      </div>
+    </div>`;
+
+  if (i === 3) return `
+    <div class="tab-content ${vis}" id="tab-3">
+      ${d.questions.map((q,n) => `
+        <div class="q-item">
+          <div class="q-num">${n+1}</div>
+          <div class="q-text">「${q}」</div>
+        </div>`).join('')}
+      <div class="resource-note">
+        <div class="label">以资源为导向的方法</div>
+        <p>问题永远不是：缺少什么？——而是：什么被束缚在那里，如何才能再次获得它？</p>
+      </div>
+    </div>`;
+
+  if (i === 4) return `
+    <div class="tab-content ${vis}" id="tab-4">
+      <div class="illus-grid">
+        <div class="illus-card">
+          <div class="illus-card-title">头身比例</div>
+          ${SVG.proportion[el]}
+          <div class="illus-caption">人物画中可见的发展阶段</div>
+        </div>
+        <div class="illus-card">
+          <div class="illus-card-title">儿童画特征</div>
+          ${SVG.drawing[el]}
+          <div class="illus-caption">此阶段的典型图像标志</div>
+        </div>
+        <div class="illus-card">
+          <div class="illus-card-title">图式游戏素描</div>
+          ${SVG.schema[el]}
+          <div class="illus-caption">此阶段的早期运动模式</div>
+        </div>
+        <div class="illus-card">
+          <div class="illus-card-title">当今活动与运动</div>
+          ${SVG.sport[el]}
+          <div class="illus-caption">图式在成人生活中的体现</div>
+        </div>
+      </div>
+    </div>`;
+
+  return '';
+}
+
+function switchTab(i) {
+  currentTab = i;
+  document.querySelectorAll('.tab-btn').forEach((b,n) => b.classList.toggle('active', n===i));
+  document.querySelectorAll('.tab-content').forEach((c,n) => c.classList.toggle('visible', n===i));
+}
+</script>
+</body>
+</html>
